@@ -3,6 +3,7 @@ import numpy as np
 from domain.chromosome import Chromosome
 from domain.gene import Gene
 from services.fitness import FitnessCalculator
+import random
 
 number_of_drones = 5
 map_seed = 123
@@ -10,8 +11,10 @@ calculator = FitnessCalculator(number_of_drones, map_seed)
 
 delivery_items = calculator.get_delivery_items()
 
-#BEGIN EXAMPLE
+movements = ['N','W','S','E','P','D']
 
+#BEGIN EXAMPLE
+'''
 genes = np.array([Gene(0, 'P', delivery_items[0]),
                   Gene(0, 'E'),
                   Gene(0, 'E'),
@@ -65,11 +68,38 @@ genes = np.array([Gene(0, 'P', delivery_items[0]),
                   Gene(4, 'P', delivery_items[3]),
                   Gene(4, 'W'),
                   Gene(4, 'D', delivery_items[3])])
+'''
 
-chromosome = Chromosome(genes)
+genes = []
+#create genes for each drone
+for droneIndex in range(0,5):
+    #start with 3 mvoements per drone
+    for mov in range(0, 3):
+        currentMovement = movements[random.randint(0, 5)]
+        if( currentMovement == 'P' or currentMovement == 'D'):
+            index = random.randint(0, len(delivery_items) - 1)
+            gene = Gene(droneIndex, currentMovement, delivery_items[index])
+        else:
+            gene = Gene(droneIndex, currentMovement)
+        genes.append(gene)
 
-calculator.print_map()
+genes = np.array(genes)
 
-print "Chromosome Fitness [decimal percentage of items delivered, ratio of total distance traveled vs. map area]:", calculator.get_fitness(chromosome)
+try:
+    chromosome = Chromosome(genes)
+    chromosomeFitness = calculator.get_fitness(chromosome)
+    if(chromosomeFitness[1] == float('Inf')):
+        print 'value is infinity'
+    else:
+        print chromosomeFitness
+except:
+    print "exception"
+                
+       
+#print chromosomeFitness
+#calculator.print_map()
+#print "Chromosome Fitness [decimal percentage of items delivered, ratio of total distance traveled vs. map area]:", calculator.get_fitness(chromosome)
 
 #END EXAMPLE
+
+
